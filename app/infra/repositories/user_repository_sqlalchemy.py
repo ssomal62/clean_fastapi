@@ -1,11 +1,10 @@
-from sqlalchemy import select, and_, tuple_
+from sqlalchemy import select, tuple_
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.domain.user import User, Profile
 from app.domain.user_repository import UserRepository
 from app.infra.models.user_db_model import UserModel
-from sqlalchemy import select, tuple_
 from typing import Optional
-from datetime import datetime, timezone, tzinfo
+from datetime import datetime
 
 class SqlAlchemyUserRepository(UserRepository):
     def __init__(self, session: AsyncSession):

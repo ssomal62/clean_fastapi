@@ -18,6 +18,12 @@ dependencies = [
     "psycopg[binary]==3.2.3",
     "greenlet==3.1.1",
     "PyJWT[crypto]==2.9.0",
+
+    "celery==5.4.0",         # Celery 최신 안정판
+    "kombu==5.3.7",          # Celery 내부 메시징 라이브러리 (RabbitMQ 호환)
+    "billiard==4.2.0",       # 멀티프로세싱 지원 (Celery 필수 의존성)
+    "amqp==5.2.0",           # RabbitMQ와 직접 통신하는 드라이버
+    "psycopg2-binary==2.9.9",# Celery 결과 백엔드 (동기 드라이버)
     
     "aiohttp>=3.8.0", #HTTP 클라이언트 (사용자 추가 스크립트용)
 ]

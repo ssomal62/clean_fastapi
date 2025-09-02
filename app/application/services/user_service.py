@@ -8,13 +8,15 @@ from typing import Optional
 # 4. 로컬 패키지
 from app.domain.user import User, Profile, Role
 from app.application.unit_of_work import UnitOfWork
-from utils.crypto import Crypto
+from app.application.ports.password_hasher import PasswordHasher
+from app.application.ports.email_sender import EmailSender
 
 class UserService:
 
-    def __init__(self, uow: UnitOfWork):
+    def __init__(self, uow: UnitOfWork, hasher: PasswordHasher, email_sender: EmailSender):
         self.uow = uow
-        self.crypto = Crypto()
+        self.hasher = hasher
+        self.email_sender = email_sender
 
     # ---------------------------------------------------------------------
     # Create
@@ -31,13 +33,19 @@ class UserService:
             user: User = User(
                 id=str(uuid.uuid4()),
                 profile=Profile(name=name, email=email),
-                password=self.crypto.encrypt(password),
+                password=self.hasher.encrypt(password),
                 memo=memo,
                 role=role,
                 created_at=now,
                 updated_at=now,
             )
             await uow.user_repository.save(user)
+
+            await self.email_sender.send(
+                email, 
+                "Clean-Fastapi 회원가입 완료",
+                f"{name}님, 회원가입을 환영합니다!",
+                )
             return user
 
     # ---------------------------------------------------------------------
@@ -82,14 +90,14 @@ class UserService:
             if not user:
                 raise HTTPException(404, detail=f"User not found: {email}")
         
-            if not self.crypto.verify(current_password, user.password):
+            if not self.hasher.verify(current_password, user.password):
                 raise HTTPException(401, detail="Invalid password")
 
             changes: dict = {}
             if new_name is not None:
                 changes["name"] = new_name
             if new_password is not None:
-                changes["password"] = self.crypto.encrypt(new_password)
+                changes["password"] = self.hasher.encrypt(new_password)
             if new_memo is not None:
                 changes["memo"] = new_memo
             if new_role is not None:

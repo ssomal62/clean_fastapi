@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel  
 from app.application.services.user_service import UserService
 from app.schemas.user_request import CreateUserBody, UpdateUserBody
 from app.schemas.user_response import UserResponse
