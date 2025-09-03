@@ -1,6 +1,5 @@
 from pydantic import EmailStr
 from fastapi import HTTPException, status
-from app.domain.user_repository import UserRepository
 from app.common.security import create_access_token
 from app.application.unit_of_work import UnitOfWork
 from app.application.ports.password_hasher import PasswordHasher
