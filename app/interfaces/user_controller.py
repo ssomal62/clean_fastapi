@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 @inject
 async def create_user(
     body: CreateUserBody,
-    user_service: UserService = Depends(Provide["user_service"]),
+    user_service: UserService = Depends(Provide["application.user_service"]),
     ):
 
     user = await user_service.create_user(
@@ -29,7 +29,7 @@ async def create_user(
 async def list_users(
     limit: int = Query(default=10, ge=1, le=100),
     cursor: Optional[str] = None,
-    user_service: UserService = Depends(Provide["user_service"]),  
+    user_service: UserService = Depends(Provide["application.user_service"]),  
 ):
     cursor_created_at, cursor_id = None, None
     if cursor:
@@ -47,7 +47,7 @@ async def list_users(
 async def update_user(
     body: UpdateUserBody,
     current_user: CurrentUser = Depends(get_current_user),
-    user_service: UserService = Depends(Provide["user_service"]),
+    user_service: UserService = Depends(Provide["application.user_service"]),
 ):
 
     user = await user_service.update_user(
@@ -66,7 +66,7 @@ async def update_user(
 async def delete_user(
     user_id: str,
     current_user: CurrentUser = Depends(get_admin_user),
-    user_service: UserService = Depends(Provide["user_service"]),
+    user_service: UserService = Depends(Provide["application.user_service"]),
 ):
     deleted = await user_service.delete_user(user_id)
     if not deleted:
