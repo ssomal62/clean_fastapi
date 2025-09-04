@@ -104,3 +104,51 @@ class NoteRepository(Protocol):
 * Alembic (마이그레이션)
 * JWT 인증
 * dependency-injector (DI 컨테이너)
+
+---
+
+## 설치 및 실행
+
+### 기본 설치
+
+```bash
+# 프로덕션 의존성만 설치
+uv sync
+
+# 또는 개발용 의존성 포함 설치
+uv sync --extra all
+```
+
+### 개발용 의존성 옵션
+
+```bash
+# 테스트만 설치
+uv sync --extra test
+
+# 린팅 도구만 설치
+uv sync --extra lint
+
+# 포맷팅 도구만 설치
+uv sync --extra format
+
+# 모든 개발 도구 설치
+uv sync --extra all
+```
+
+### 개발 도구 사용법
+
+```bash
+# 테스트 실행
+uv run pytest
+
+# 코드 포맷팅
+uv run black .
+uv run isort .
+
+# 린팅
+uv run flake8 .
+uv run mypy .
+
+# 커버리지 테스트
+uv run pytest --cov=app
+```
