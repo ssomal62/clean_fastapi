@@ -4,10 +4,11 @@ from typing import Optional
 from dependency_injector.wiring import Provide, inject
 from fastapi import APIRouter, Depends, Query
 
-from .mapper import user_to_response, users_to_response
+from ..common.mappers import user_to_response, users_to_response
 from ..dtos import CreateUserBody, UpdateUserBody, UserResponse  
 from ...src.user.service import UserService
-from ...src.infrastructure.jwt_provider import CurrentUser, get_current_user_from_token
+from ..deps import get_current_user_from_token, get_admin_user_from_token
+from ...src.infrastructure.jwt_provider import CurrentUser
 from ...src.shared.exceptions import NotFoundException
 from ..container import MainContainer
 
@@ -20,12 +21,18 @@ async def create_user(
     user_service: UserService = Depends(Provide[MainContainer.user_service]),
     ):
 
-    user = await user_service.create_user(
-        body.name,
-        body.email,
-        body.password,
-    )
-    return user_to_response(user)
+    try:
+        user = await user_service.create_user(
+            body.name,
+            body.email,
+            body.password,
+            body.memo,
+            body.role.lower(),
+        )
+        return user_to_response(user)
+    except Exception as e:
+        print(f"Error in create_user router: {e}")
+        raise
 
 @router.get("", status_code=200)
 @inject
@@ -68,7 +75,7 @@ async def update_user(
 @inject
 async def delete_user(
     user_id: str,
-    current_user: CurrentUser = Depends(Provide[MainContainer.get_admin_user]),
+    current_user: CurrentUser = Depends(get_admin_user_from_token),
     user_service: UserService = Depends(Provide[MainContainer.user_service]),
 ):
     deleted = await user_service.delete_user(user_id)

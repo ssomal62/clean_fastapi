@@ -5,7 +5,6 @@ from typing import Optional
 from pydantic import BaseModel
 
 from ..domains import Note, Tag
-from ....webapp.dtos import CreateNoteBody, UpdateNoteBody
 
 
 class CreateNoteCommand(BaseModel):
@@ -15,16 +14,6 @@ class CreateNoteCommand(BaseModel):
     memo_date: str
     tag_names: Optional[list[str]] | None = None
 
-    @classmethod
-    def from_request(cls, user_id: str, body: CreateNoteBody) -> CreateNoteCommand:
-        return cls(
-            user_id=user_id,
-            title=body.title,
-            content=body.content,
-            memo_date=body.memo_date,
-            tag_names=body.tag_names,
-        )
-
 class UpdateNoteCommand(BaseModel):
     user_id: str
     id: str
@@ -33,24 +22,6 @@ class UpdateNoteCommand(BaseModel):
     memo_date: Optional[str] | None = None
     tag_names: Optional[list[str]] | None = None
 
-    @classmethod
-    def from_request(cls, user_id: str, id: str, body: UpdateNoteBody) -> UpdateNoteCommand:
-        return cls(
-            user_id=user_id,
-            id=id,
-            title=body.title,
-            content=body.content,
-            memo_date=body.memo_date,
-            tag_names=body.tag_names,
-        )
-
 class DeleteNoteCommand(BaseModel):
     user_id: str
     id: str
-
-    @classmethod
-    def from_request(cls, user_id: str, id: str) -> DeleteNoteCommand:
-        return cls(
-            user_id=user_id,
-            id=id,
-        )

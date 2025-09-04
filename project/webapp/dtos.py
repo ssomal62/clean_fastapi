@@ -24,14 +24,14 @@ class LoginResponse(BaseModel):
 # User DTOs
 # ============================================================================
 
-RoleStr = Literal["ADMIN", "USER"]  # 도메인 Enum 대신 문자열 리터럴
+RoleStr = Literal["admin", "user"] 
 
 class CreateUserBody(BaseModel):
     name: str = Field(min_length=1, max_length=32)
     email: EmailStr = Field(max_length=64)
     password: str = Field(min_length=8, max_length=64)
     memo: str | None = None
-    role: RoleStr = Field(default="USER")
+    role: RoleStr = Field(default="user")
 
 
 class UpdateUserBody(BaseModel):

@@ -6,7 +6,6 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from ..infrastructure.email_sender import SendWelcomeEmailTask as EmailSender
-from ..infrastructure.jwt_provider import JwtProvider as JwtProvider
 from ..infrastructure.argon2_password_hasher import Argon2PasswordHasher as PasswordHasher
 from ..infrastructure.unit_of_work import SqlAlchemyUnitOfWork as UnitOfWork
 # 4. 로컬 패키지
@@ -17,11 +16,10 @@ from .domains import Profile, User
 
 class UserService:
 
-    def __init__(self, uow: UnitOfWork, hasher: PasswordHasher, email_sender: EmailSender, jwt_provider: JwtProvider):
+    def __init__(self, uow: UnitOfWork, hasher: PasswordHasher, email_sender: EmailSender):
         self.uow = uow
         self.hasher = hasher
         self.email_sender = email_sender
-        self.jwt_provider = jwt_provider
 
     # ---------------------------------------------------------------------
     # Create
@@ -46,11 +44,12 @@ class UserService:
             )
             await uow.user_repository.save(user)
 
-            await self.email_sender.send(
-                email, 
-                "Clean-Fastapi 회원가입 완료",
-                f"{name}님, 회원가입을 환영합니다!",
-                )
+            # 임시로 이메일 발송 비활성화
+            # await self.email_sender.send(
+            #     email, 
+            #     "Clean-Fastapi 회원가입 완료",
+            #     f"{name}님, 회원가입을 환영합니다!",
+            #     )
             return user
 
     # ---------------------------------------------------------------------

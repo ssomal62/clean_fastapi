@@ -6,11 +6,21 @@ from ...src.note.service import NoteService
 from ..dtos import CreateNoteBody, UpdateNoteBody, NotePageResponse, NoteResponse
 from ...src.note.cqrs.commands import CreateNoteCommand, DeleteNoteCommand, UpdateNoteCommand
 from ...src.note.cqrs.queries import GetNoteQuery, GetNotesByTagQuery, GetNotesQuery
-from ...src.infrastructure.jwt_provider import CurrentUser, get_current_user_from_token
+from ..deps import get_current_user_from_token
+from ...src.infrastructure.jwt_provider import CurrentUser
 from ..common.pagination import parse_cursor
 from dependency_injector.wiring import Provide, inject
 from ..container import MainContainer
-from .mapper import note_to_response, notes_to_response
+from ..common.mappers import (
+    note_to_response, 
+    notes_to_response,
+    to_create_command,
+    to_update_command,
+    to_delete_command,
+    to_get_notes_query,
+    to_get_note_query,
+    to_get_notes_by_tag_query
+)
 
 # 라우터 생성
 router = APIRouter(prefix="/notes", tags=["notes"])
@@ -29,7 +39,7 @@ async def create_note(
     current_user: CurrentUser = Depends(get_current_user_from_token),
     note_service: NoteService = Depends(Provide[MainContainer.note_service]),
 ):
-    cmd = CreateNoteCommand.from_request(current_user.id, body)
+    cmd = to_create_command(current_user.id, body)
     note = await note_service.create_note(cmd)
     return note_to_response(note)
 
@@ -49,7 +59,7 @@ async def get_notes(
 ):
     cursor_created_at, cursor_id = parse_cursor(cursor)
 
-    query = GetNotesQuery.from_request(
+    query = to_get_notes_query(
         current_user.id, 
         limit, 
         cursor_created_at, 
@@ -71,7 +81,7 @@ async def get_note(
     current_user: CurrentUser = Depends(get_current_user_from_token),
     note_service: NoteService = Depends(Provide[MainContainer.note_service]),
 ):
-    query = GetNoteQuery.from_request(current_user.id, id)
+    query = to_get_note_query(current_user.id, id)
     note = await note_service.get_note(query)
     return note_to_response(note)
 
@@ -89,7 +99,7 @@ async def update_note(
     current_user: CurrentUser = Depends(get_current_user_from_token),
     note_service: NoteService = Depends(Provide[MainContainer.note_service]),
 ):
-    cmd = UpdateNoteCommand.from_request(current_user.id, id, body)
+    cmd = to_update_command(current_user.id, id, body)
     note = await note_service.update_note(cmd)
     return note_to_response(note)
 
@@ -105,7 +115,7 @@ async def delete_note(
     current_user: CurrentUser = Depends(get_current_user_from_token),
     note_service: NoteService = Depends(Provide[MainContainer.note_service]),
 ):
-    cmd = DeleteNoteCommand.from_request(current_user.id, id)
+    cmd = to_delete_command(current_user.id, id)
     await note_service.delete_note(cmd)
     return Response(status_code=204)
 
@@ -126,9 +136,9 @@ async def get_notes_by_tag(
 ):
     cursor_created_at, cursor_id = parse_cursor(cursor)
 
-    query = GetNotesByTagQuery.from_request(
+    query = to_get_notes_by_tag_query(
         current_user.id, 
-        tag_name, 
+        tag_name,
         limit, 
         cursor_created_at, 
         cursor_id

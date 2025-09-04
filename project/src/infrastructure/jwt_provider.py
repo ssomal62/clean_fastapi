@@ -64,19 +64,17 @@ class JwtProvider:
 
 # FastAPI OAuth2와 호환되는 함수들
 def get_current_user_from_token(token: str = Depends(security)) -> CurrentUser:
-    """OAuth2 토큰에서 현재 사용자 정보를 가져옵니다."""
-    from ...webapp.container import MainContainer
-    container = MainContainer()
-    jwt_provider = container.infrastructure.jwt_provider()
-    return jwt_provider.get_current_user(token)
+    """OAuth2 토큰에서 현재 사용자 정보를 가져옵니다.
+    이 함수는 webapp에서 의존성 주입을 통해 jwt_provider를 받아 사용해야 합니다.
+    """
+    raise NotImplementedError("이 함수는 webapp에서 의존성 주입을 통해 사용해야 합니다.")
 
 
 def get_admin_user_from_token(token: str = Depends(security)) -> CurrentUser:
-    """OAuth2 토큰에서 관리자 사용자 정보를 가져옵니다."""
-    from ...webapp.container import MainContainer
-    container = MainContainer()
-    jwt_provider = container.infrastructure.jwt_provider()
-    return jwt_provider.get_admin_user(token)
+    """OAuth2 토큰에서 관리자 사용자 정보를 가져옵니다.
+    이 함수는 webapp에서 의존성 주입을 통해 jwt_provider를 받아 사용해야 합니다.
+    """
+    raise NotImplementedError("이 함수는 webapp에서 의존성 주입을 통해 사용해야 합니다.")
 
 
 
